@@ -1,20 +1,75 @@
 h1 {
-    color: green;
-    font-style: italic;
-  }
+  color: #111;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-align: center;
+}
 
-  .note {
-    color: grey;
-    padding-top: 5px;
-    font-size: 15px;
-  }
+.note {
+  color: grey;
+  padding-top: 5px;
+  font-size: 15px;
+}
 
-  .error {
-    color: green;
-    background: lightgrey;
-    font-size: 20px;
-    border-style: solid;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
+.error {
+  color: green;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  height: 18px ;
+}
+
+.photo {
+  height: 40px;
+  width: 45px;
+  vertical-align: middle;
+}
+
+body {
+  margin: auto;
+  width: 1024px;
+  padding: 10px;
+  background-color: #ebebeb;
+  font-size: 16x;
+  font-family: Verdana;
+}
+
+h2{
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.addButton{
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 5px;;
+}
+
+.deleteButton{
+  background-color: red; /* Green */
+  border: none;
+  color: white;
+  padding: 4px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-left: 5px;;
+}
+
+.personList{
+  list-style-type: none; 
+  margin: 0.5; 
+}

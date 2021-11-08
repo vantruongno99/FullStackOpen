@@ -1,15 +1,15 @@
 import React from 'react'
-
+import '../index.css'
 const PersonForm = ({onSubmit, newName, handleNameChange, newNumber, handleNumberChange}) =>
   <form onSubmit={onSubmit}>
         <div>
-            name: <input value={newName} onChange={handleNameChange} />
+            name:&nbsp;&nbsp;&nbsp;&nbsp; <input  value={newName} onChange={handleNameChange}  />
         </div>
         <div>
-            number: <input value={newNumber} onChange={handleNumberChange} />
+            number:&nbsp; <input value={newNumber} onChange={handleNumberChange} />
         </div>
         <div>
-            <button type="submit">add</button>
+            <button className="addButton" type="submit">add</button>
         </div>
     </form>
 

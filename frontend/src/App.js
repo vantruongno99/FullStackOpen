@@ -4,6 +4,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Notification from './components/Notification'
+import logo  from './phonebook.png'; 
 import './index.css'
 
 const App = () => {
@@ -85,13 +86,12 @@ const App = () => {
   };
 
   const deletePerson = (person) => {
-    const res = window.confirm(`Delete ${person.name}`)
-    if (res) {
-      personService.Delete(person.id)
+    if (window.confirm(`Delete ${person.name}`)) {
+      personService.Delete(person.id).then(()=>{
       setPersons(persons.filter(p => p.id !== person.id))
       setNotify(`${person.name} has been deleted`)
           setTimeout(() => {
-          setNotify(null)}, 5000)
+          setNotify(null)}, 5000)})
           .catch(error => {
             setNotify(error.response.data.error);
             setTimeout(() => {
@@ -124,7 +124,9 @@ const App = () => {
 
   return (
     <div>
-      <h1>Phone book</h1>
+      <div class="header">
+      <h1> <img src={logo} className="photo" alt="Logo" /> Phone book</h1>
+      </div>
       <Notification message={notify} />
       <Filter filter={newFilter} onChange={handleFilterChange} />
       <h2>Add a new number</h2>
