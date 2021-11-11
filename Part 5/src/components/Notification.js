@@ -1,10 +1,15 @@
+import React from 'react'
 
 const Notification = ({ message }) => {
-    return (
-      <div className="error">
-        {message}
-      </div>
-    )
-  }
+	if (message === null) {
+		return null
+	}
 
-  export default Notification
+	return (
+		<div className="error">
+			{message}
+		</div>
+	)
+}
+
+export default Notification

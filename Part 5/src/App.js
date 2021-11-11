@@ -1,140 +1,159 @@
-import React, { useState, useEffect } from 'react'
-import personService from './services/persons'
-import Filter from './components/Filter'
-import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
-import Notification from './components/Notification'
-import logo  from './phonebook.png'; 
-import './index.css'
-
+import React, { useState, useEffect, useRef } from 'react'
+import jwt_decode from 'jwt-decode'
+import LoginForm from './components/LoginForm'
+import Blogs from './components/Blogs'
+import Togglable from './components/Togglable'
+import Notificaton from './components/Notification'
+import blogService from './services/blogs'
+import loginService from './services/login'
+import BlogForm from './components/Blogform'
 const App = () => {
-  const [persons, setPersons] = useState([])
-  const [newNumber, setNewNumber] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newFilter, setFilter] = useState('');
-  const [notify, setNotify] = useState(null)
+	const [blogs, setBlogs] = useState([])
+	const [username, setUsername] = useState('')
+	const [password, setPassword] = useState('')
+	const [user, setUser] = useState(null)
+	const [errorMessage, setErrorMessage] = useState(null)
 
-  const handleNameChange = (event) => {
-    setNewName(event.target.value);
-  }
+	useEffect(() => {
+		blogService.getAll().then(blogs =>
+			setBlogs(blogs)
+		)
+	}, [])
 
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value);
-  }
+	useEffect(() => {
+		const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+		if (loggedUserJSON) {
+			const user = JSON.parse(loggedUserJSON)
+			if (jwt_decode(user.token).exp < Date.now() / 1000) {
+				handleLogout()
+			}
+			blogService.setToken(user.token)
+			setUser(user)
+		}
+	}, [])
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  }
+	const blogFormRef = useRef()
 
-  const hook = () => {
-    personService
-      .getAll()
-      .then(res =>
-        setPersons(res)
-      )
-  }
+	const handleLogin = async (event) => {
+		event.preventDefault()
 
-  useEffect(hook, [])
+		try {
+			const user = await loginService.login({
+				username, password,
+			})
+			window.localStorage.setItem(
+				'loggedBlogappUser', JSON.stringify(user)
+			)
+			setUser(user)
+			setUsername('')
+			setPassword('')
+		} catch (exception) {
+			setErrorMessage('Wrong credentials')
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		}
+	}
 
-  const personsToShow = newFilter === ''
-    ? persons
-    : persons.filter(person =>
-      person.name.toLowerCase().includes(newFilter.toLowerCase()))
+	const addBlog = (blogObject) => {
+		try {
+			blogFormRef.current.toggleVisibility()
+			blogService.create(blogObject).then(returnedBlog =>
+				setBlogs(blogs.concat(returnedBlog))
+			)
+			setErrorMessage(`${blogObject.title} has been addded`)
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		} catch (error) {
+			setErrorMessage('Wrong credentials')
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		}
+	}
 
-  const checkInput = () => {
-    const findedPerson = persons.find(person => person.name === newName)
+	const handleLikes = async (id, blog) => {
+		try {
+			const updatedBlog = {
+				likes: blog.likes + 1
+			}
+			const returnedBlog = await blogService.update(id, updatedBlog)
+			setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+			console.log(returnedBlog)
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		} catch (error) {
+			console.log(error)
+			setErrorMessage('Wrong credentials')
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		}
+	}
 
-    if (findedPerson) {
-      const result = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
-      if (result) {
-        const newPerson = {
-          id: findedPerson.id,
-          name: newName,
-          number: newNumber
-        }
-        handleOnUpdate(newPerson)
-      }
-      return false
-    }
-    return true
-  }
+	const handleRemove = async (id) => {
+		try {
+			const selectedBlog = blogs.find(n => n.id === id)
+			if (window.confirm(`remove blog ${selectedBlog.title} by ${selectedBlog.author}`)) {
+				console.log('1')
+				await blogService.remove(id)
+				setBlogs(blogs.filter(n => n.id !== id))
+			}
+		} catch (error) {
+			setErrorMessage('Wrong credentials')
+			setTimeout(() => {
+				setErrorMessage(null)
+			}, 5000)
+		}
+	}
 
-  const addPerson = (event) => {
-    event.preventDefault()
-    if (checkInput()) {
-      const person = {
-        name: newName,
-        number: newNumber
-      }
-      personService
-        .create(person)
-        .then((createdPerson) => {
-          setPersons(persons.concat(createdPerson))
-          setNewNumber('')
-          setNewName('')
-          setNotify(`${person.name} has been added`)
-          setTimeout(() => {
-          setNotify(null)}, 5000)
-        })
-        .catch(error => {
-          setNotify(error.response.data.error);
-          setTimeout(() => {
-            setNotify(null)
-          }, 5000)
-        })
-    }
-  };
 
-  const deletePerson = (person) => {
-    if (window.confirm(`Delete ${person.name}`)) {
-      personService.Delete(person.id).then(()=>{
-      setPersons(persons.filter(p => p.id !== person.id))
-      setNotify(`${person.name} has been deleted`)
-          setTimeout(() => {
-          setNotify(null)}, 5000)})
-          .catch(error => {
-            setNotify(error.response.data.error);
-            setTimeout(() => {
-              setNotify(null)
-            }, 5000)
-          })
-      }
-    }
-  
+	const blogForm = () => (
+		<Togglable buttonLabel='creat new blog' ref={blogFormRef}>
+			<BlogForm createBlog={addBlog} />
+		</Togglable>
+	)
 
-  const handleOnUpdate = (updatedPerson) => {
-    personService.update(updatedPerson.id, updatedPerson).then(personData => {
-      let newListPersons = persons.map(person => person.name === personData.name ? personData : person)
-      setPersons(newListPersons)
-      setNewNumber('')
-      setNewName('')
-      setNotify(`${updatedPerson.name} has been updated`)
-      setTimeout(() => {
-      setNotify(null)}, 5000)
-    }).catch((error) => {
-      setNotify({
-        error: `Information for ${updatedPerson.name} has already been removed from server`,
-      });
-      setPersons(persons.filter(p => p.id !== updatedPerson.id))
-      setTimeout(() => {
-        setNotify(null);
-      }, 5000)
-    })
-  }
+	const handleLogout = (event) => {
+		event.preventDefault()
+		window.localStorage.clear()
+		setUser(null)
 
-  return (
-    <div>
-      <div class="header">
-      <h1> <img src={logo} className="photo" alt="Logo" /> Phone book</h1>
-      </div>
-      <Notification message={notify} />
-      <Filter filter={newFilter} onChange={handleFilterChange} />
-      <h2>Add a new number</h2>
-      <PersonForm onSubmit={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
-      <h2>Numbers</h2>
-      <Persons persons={personsToShow} handleOnDelete={deletePerson} />
-    </div>
-  )
+	}
+
+	if (user === null) {
+		return (
+			<div>
+				<Notificaton message={errorMessage} />
+				<h2>Log in to application</h2>
+				<Togglable buttonLabel='login'>
+					<LoginForm
+						username={username}
+						password={password}
+						handleUsernameChange={({ target }) => setUsername(target.value)}
+						handlePasswordChange={({ target }) => setPassword(target.value)}
+						handleSubmit={handleLogin}
+					/>
+				</Togglable>
+			</div>
+		)
+	}
+
+	return (
+		<div>
+			<Notificaton message={errorMessage} />
+			<h2>blogs</h2>
+			<p>
+				{user.name} logged in <button onClick={handleLogout}>logout</button>
+			</p>
+			{blogForm()}
+			<Blogs blogs={blogs} handleLikes={handleLikes} handleRemove={handleRemove} user={user} />
+
+
+		</div>
+	)
 }
 
 export default App
