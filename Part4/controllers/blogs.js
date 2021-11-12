@@ -1,9 +1,6 @@
 const blogsRouter = require('express').Router();
 const middleware = require('../utils/middleware');
 const Blog = require('../models/blog');
-const User = require('../models/user');
-const jwt = require('jsonwebtoken')
-const config = require('../utils/config')
 
 
 blogsRouter.get('/', async (request, response) => {
@@ -30,9 +27,10 @@ blogsRouter.post('/',middleware.userExtractor, async (request, response) => {
     user: user._id
   });
   const savedBlog = await blog.save();
+  const respondBlog = await blog.populate('user', { username: 1, name: 1 });
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save({ validateModifiedOnly: true })
-  response.json(savedBlog);
+  response.json(respondBlog);
 });
 
 blogsRouter.delete('/:id',middleware.userExtractor, async (request, response) => {
@@ -59,7 +57,8 @@ blogsRouter.put('/:id',middleware.userExtractor, async (request, response) => {
   }
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true });
   if (updatedBlog) {
-    response.json(updatedBlog)
+    const respondBlog = await updatedBlog.populate('user', { username: 1, name: 1 })
+    response.json(respondBlog)
   }
   else {
     response.status(404).end();
