@@ -31,6 +31,7 @@ const update = async (id, updateBlog) => {
 		updateBlog,
 		config
 	)
+	console.log(response.data)
 	return response.data
 }
 

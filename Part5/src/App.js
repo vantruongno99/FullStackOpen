@@ -116,7 +116,7 @@ const App = () => {
 		</Togglable>
 	)
 
-	const handleLogout = (event) => {
+	const handleLogout = async (event) => {
 		event.preventDefault()
 		window.localStorage.clear()
 		setUser(null)
