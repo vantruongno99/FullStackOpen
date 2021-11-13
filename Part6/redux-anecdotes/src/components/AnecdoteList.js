@@ -1,18 +1,20 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'  
 import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
-const AnecdoteList = () => {
+const AnecdoteList = (props) => {
     const anecdotes = useSelector(state => state.anecdotes)
     const filter = useSelector(state => state.filter)
     const filterrdAnecdotes = anecdotes.filter(anecdote =>
       anecdote.content.toLowerCase().includes(filter.toLowerCase()))
-    const dispatch = useDispatch()
+  
+  
+      const dispatch = useDispatch()
 
     const addVote = anecdote => {
         dispatch(voteAnecdote(anecdote))
-        dispatch(setNotification(`you voted for ${anecdote.content}` , 10 ))
+        dispatch(setNotification(`you voted for ${anecdote.content}`,10))
     }
 
     return (<div>
