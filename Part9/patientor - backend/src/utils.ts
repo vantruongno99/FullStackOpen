@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender } from "./types"
+import { NewPatientEntry, Gender, Entry } from "./types"
 
 const isString = (text: unknown): text is string => {
   return typeof text === "string" || text instanceof String;
@@ -50,6 +50,12 @@ const parseGender = (gender: unknown): Gender => {
   return gender;
 };
 
+const isEntry = (type: any): type is Entry["type"] => ["Hospital", "OccupationalHealthcare", "HealthCheck"].includes(type);
+const parseEntries = (entries: any): Entry[] => {
+  if (!entries.every((entry: any) => (isEntry(entry.type) && entry))) throw new Error('Incorrect or missing entry: ' + entries);
+  return entries;
+};
+
 type Fields = {
   id: unknown;
   name: unknown;
@@ -57,6 +63,7 @@ type Fields = {
   ssn: unknown;
   gender: unknown;
   occupation: unknown;
+  entries: unknown;
 };
 
 const toNewPatientEntry = ({
@@ -65,6 +72,7 @@ const toNewPatientEntry = ({
   ssn,
   gender,
   occupation,
+  entries,
 }: Fields): NewPatientEntry => {
   const newEntry: NewPatientEntry = {
     name: parseName(name),
@@ -72,7 +80,7 @@ const toNewPatientEntry = ({
     ssn: parseSsn(ssn),
     gender: parseGender(gender),
     occupation: parseOcupation(occupation),
-    entries:[]
+    entries: parseEntries(entries)
   };
 
   return newEntry;

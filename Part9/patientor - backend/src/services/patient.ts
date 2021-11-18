@@ -1,4 +1,4 @@
-import patientData from '../data/patientData'
+import patientData from '../data/patients'
 import { PatientEntry, NewPatientEntry, PublicPatient } from '../types'
 import { v4 as uuid } from "uuid";
 
@@ -6,13 +6,14 @@ let patients: Array<PatientEntry> = patientData;
 
 
 const getAll = (): PublicPatient[] => {
-  return patients.map(({ id, name, gender, occupation, dateOfBirth }) => {
+  return patients.map(({ id, name, gender, occupation, dateOfBirth,entries }) => {
     return {
       id,
       name,
       dateOfBirth,
       gender,
-      occupation
+      occupation,
+      entries
     };
   });
 };

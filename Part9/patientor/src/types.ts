@@ -5,7 +5,7 @@ export interface Diagnosis {
   "latin"?: string
 }
 
-export interface PatientEntry {
+export interface Patient {
   id: string;
   name: string;
   ssn: string;
@@ -15,11 +15,11 @@ export interface PatientEntry {
   entries: Entry[];
 }
 
-export type PublicPatient = Omit<PatientEntry, 'ssn' | 'entries'>
+export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
 
-export type NewPatientEntry = Omit<PatientEntry, 'id'>;
+export type NewPatientEntry = Omit<Patient, 'id'>;
 
-export type NonSensitivePatientEntry = Omit<PatientEntry, 'ssn'>;
+export type NonSensitivePatientEntry = Omit<Patient, 'ssn'>;
 
 export enum Gender {
   Male = "male",
@@ -36,7 +36,7 @@ interface BaseEntry {
   diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
-interface HospitalEntry extends BaseEntry {
+export interface HospitalEntry extends BaseEntry {
   type: 'Hospital';
   discharge: {
     date: string;
@@ -44,7 +44,7 @@ interface HospitalEntry extends BaseEntry {
   };
 }
 
-interface OccupationalHealthcareEntry extends BaseEntry {
+export interface OccupationalHealthcareEntry extends BaseEntry {
   type: 'OccupationalHealthcare';
   employerName: string;
   sickLeave?: {
@@ -60,7 +60,7 @@ export enum HealthCheckRating {
   'CriticalRisk' = 3
 }
 
-interface HealthCheckEntry extends BaseEntry {
+export interface HealthCheckEntry extends BaseEntry {
   type: 'HealthCheck';
   healthCheckRating: HealthCheckRating;
 }
