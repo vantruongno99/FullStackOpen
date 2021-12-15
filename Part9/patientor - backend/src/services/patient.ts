@@ -18,10 +18,10 @@ const getAll = (): PublicPatient[] => {
   });
 };
 
-const getById = (id: string): PatientEntry | undefined => {
-  const entry = patients.find(patient => patient.id === id);
-  return entry;
-};
+  const getById = (id: string): PatientEntry | undefined => {
+    const entry = patients.find(patient => patient.id === id);
+    return entry;
+  };
 
 
 const add = (patient: NewPatientEntry): PatientEntry => {

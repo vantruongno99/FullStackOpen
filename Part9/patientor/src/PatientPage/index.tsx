@@ -7,10 +7,15 @@ import GenderIcon from '../components/GenderIcon';
 import Hospital from './Hospital';
 import OccupationalHealthcare from './OccupationalHealthcare';
 import HealthCheck from './HealthCheck';
+import AddEntryModal from '../AddEntryModal';
+import { EntryFormValues } from '../AddEntryModal/AddEntryForm';
+import { Icon, SemanticCOLORS, Button } from "semantic-ui-react";
+import { useStateValue, singlePatient } from "../state";
 
 const PatientPage = () => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient>();
+  const [{diagnoses}, dispatch] = useStateValue();
   React.useEffect(() => {
     const getPatient = async () => {
       try {
@@ -43,6 +48,34 @@ const PatientPage = () => {
         return assertNever(entry);
     }
   };
+
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: newPatient } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients`,
+        values
+      );
+      dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      closeModal();
+    } catch (e) {
+      console.error((e as Error).message || 'Unknown Error');
+      setError((e as Error).message || 'Unknown error');
+    }
+  };
+
+
+
+
   if (!patient) {
     return (<p>loadinng</p>);
   }

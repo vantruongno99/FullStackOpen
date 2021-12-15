@@ -7,7 +7,7 @@ router.get('/', (_req, res) => {
    return res.json(patientService.getAll())
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res) => {  
    const patient = patientService.getById(req.params.id);
    if (patient) {
       res.send(patient);
